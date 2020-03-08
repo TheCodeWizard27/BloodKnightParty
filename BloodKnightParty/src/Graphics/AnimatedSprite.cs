@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KantanEngine.IO
+namespace BloodKnightParty.Core.Graphics
 {
-    public abstract class KantanLoader
+    public class AnimatedSprite
     {
-
-        public abstract Task Load();
-
     }
 }

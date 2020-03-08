@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using KantanEngine.Graphics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
@@ -50,9 +51,8 @@ namespace BloodKnightParty
         {
             var mouse = Mouse.GetState();
             testPos.X = mouse.X - testSprite.Width / 2;
-            testPos.Y = mouse.Y-testSprite.Height/2;
+            testPos.Y = mouse.Y - testSprite.Height/2;
             base.Update(gameTime);
-
             
         }
 
@@ -64,10 +64,10 @@ namespace BloodKnightParty
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            spriteBatch.Draw(testSprite, testPos, Color.Black);
+            spriteBatch.Draw(testSprite, testPos, new Rectangle(Point.Zero, new Point(50,50)), Color.Black);
             spriteBatch.End();
             // TODO: Add your drawing code here
-            base.Draw(gameTime);
+            //base.Draw(gameTime);
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KantanEngine.Core
+namespace KantanEngine.Graphics
 {
-    public abstract class KantanEngine
+    public abstract class KanTexture
     {
 
-        public EngineContext Context { get; protected set; }
+
 
     }
 }

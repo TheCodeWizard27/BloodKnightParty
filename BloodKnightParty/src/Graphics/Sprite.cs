@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KantanEngine.Graphics
+namespace BloodKnightParty.Core.Graphics
 {
-    public abstract class Sprite
+    public class Sprite
     {
     }
 }

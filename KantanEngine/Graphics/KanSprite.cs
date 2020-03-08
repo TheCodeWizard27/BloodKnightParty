@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace KantanEngine.Graphics
 {
-    public abstract class AnimatedSprite : Sprite
+    public abstract class KanSprite
     {
+
+
+
     }
 }
