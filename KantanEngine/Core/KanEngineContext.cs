@@ -1,4 +1,4 @@
-﻿using KantanEngine.Graphics;
+﻿using KantanEngine.Debugging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,47 +10,40 @@ namespace KantanEngine.Core
     public class KanEngineContext
     {
 
-        private Dictionary<string, object> _buffer = new Dictionary<string, object>();
+        internal IKanServiceProvider _serviceProvider;
+        internal Action<KanGameController> _switchController;
+        internal Dictionary<string, object> _localBuffer;
 
         #region Properties
 
-        public KanGraphicsEngine Graphics { get; internal set; }
+        public TimeSpan TimeDelta { get; internal set; }
 
         #endregion
 
         internal KanEngineContext()
         {
-
         }
 
         #region Public Methods
 
-        public bool BufferContains(string key) => _buffer.ContainsKey(key);
+        public void ClearLocal() => _localBuffer.Clear();
+        public void SetLocal(string local, object value) => _localBuffer.Add(local, value);
+        public bool LocalExists(string local) => _localBuffer.ContainsKey(local);
 
-        public void AddToBuffer(string key, object value, bool overrideIfExists = false)
+        public T GetLocal<T>(string local) => (T)_localBuffer[local];
+        public T TryGetLocal<T>(string local, T defaultValue = default)
         {
-            if (overrideIfExists && BufferContains(key))
-            {
-                SetBufferValue(key, value);
-                return;
-            }
-            _buffer.Add(key, value);
+            try { return TryGetLocal<T>(local); } catch { return defaultValue; }
         }
 
-        public void SetBufferValue(string key, object value, bool addIfNExists = false)
+        public T GetService<T>() where T : class => _serviceProvider.GetService<T>();
+        public void RunService<T>(Action<T> action) where T : class => action.Invoke(GetService<T>());
+        public void TryRunService<T>(Action<T> action) where T : class
         {
-            if (addIfNExists && !BufferContains(key))
-            {
-                SetBufferValue(key, value);
-                return;
-            }
-            _buffer[key] = value;
+            try { RunService<T>(action); } catch { }
         }
 
-        public object GetBufferedValue(string key) => _buffer[key];
-        public T GetBufferedValue<T>(string key) => (T)GetBufferedValue(key);
-
-        public void ClearBuffer() => _buffer.Clear();
+        public void SwitchController(KanGameController controller) => _switchController?.Invoke(controller);
 
         #endregion
 

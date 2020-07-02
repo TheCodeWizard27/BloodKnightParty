@@ -4,25 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BloodKnightParty.src.Debugging
+namespace KantanEngine.Debugging
 {
     public class Log
     {
 
         public static Log Default = new Log();
 
-        private Action<string> _outputAction;
+        public delegate void OnLogEventHandler(string message);
+        public event OnLogEventHandler OnLogEvent;
 
         private Log() { }
 
-        public void ConfigureOutput(Action<string> outputAction)
-        {
-            _outputAction = outputAction;
-        }
-
         public void WriteLine(string message)
         {
-            _outputAction?.Invoke(message);
+            OnLogEvent?.Invoke(message);
         }
 
     }

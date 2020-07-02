@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BloodKnightParty.Core.Graphics
+namespace BloodKnightParty.src.InputHandling
 {
-    public class Sprite
+    public class InputBuffer
     {
     }
 }

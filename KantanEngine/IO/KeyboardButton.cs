@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KantanEngine.Graphics
+namespace KantanEngine.IO
 {
-    public abstract class KanTexture
+    enum KeyboardButton
     {
-
-
-
+        // TODO fill or replace with already existing keyboard.
     }
 }

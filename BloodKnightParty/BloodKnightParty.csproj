@@ -53,28 +53,26 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject>BloodKnightParty.Program</StartupObject>
+  </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Core\GameEngine.cs" />
-    <Compile Include="src\Core\LoadingController.cs" />
+    <Compile Include="GameConfiguration.cs" />
+    <Compile Include="src\InputHandling\GamepadHandler.cs" />
     <Compile Include="src\Core\TestController.cs" />
-    <Compile Include="src\Debugging\Log.cs" />
-    <Compile Include="src\Graphics\AnimatedSprite.cs" />
-    <Compile Include="src\Graphics\GraphicsEngine.cs" />
-    <Compile Include="src\Graphics\Sprite.cs" />
-    <Compile Include="src\IO\Loader.cs" />
-    <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\InputHandling\GamepadHelper.cs" />
+    <Compile Include="src\InputHandling\InputBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -138,12 +136,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KantanEngine\KantanEngine.csproj">
-      <Project>{0260bcd4-2339-4a4f-a3cb-eb665709268d}</Project>
-      <Name>KantanEngine</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PublishFile Include="Content\TestSprite.png">
       <Visible>False</Visible>
       <Group>
@@ -161,6 +153,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KantanEngine\KantanEngine.csproj">
+      <Project>{26CCA293-090A-4201-ACCA-46D21F9256F7}</Project>
+      <Name>KantanEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoKanEngine\MonoKanEngine.csproj">
+      <Project>{85f73731-445c-4cb0-b830-922f00152172}</Project>
+      <Name>MonoKanEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

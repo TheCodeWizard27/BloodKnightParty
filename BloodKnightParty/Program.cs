@@ -1,8 +1,6 @@
-﻿using BloodKnightParty.Core;
-using BloodKnightParty.src.Core;
-using BloodKnightParty.src.Debugging;
-using KantanEngine.Core;
-using Microsoft.Xna.Framework;
+﻿using BloodKnightParty.src.Core;
+using KantanEngine.Debugging;
+using MonoKanEngine.src;
 using System;
 
 namespace BloodKnightParty
@@ -10,50 +8,18 @@ namespace BloodKnightParty
     /// <summary>
     /// The main class.
     /// </summary>
-    public class Program : Game
+    public class Program
     {
-        private GraphicsDeviceManager _graphics;
-        private GameEngine _engine;
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            Log.Default.ConfigureOutput((msg) => Console.WriteLine($"[{DateTime.Now:hh:mm:ss}] {msg}"));
+            Log.Default.OnLogEvent += (msg) => Console.WriteLine($"[{DateTime.Now:mm:ss:fff}] {msg}");
 
-            using (var program = new Program())
-                program.Run();
-        }
-
-        public Program()
-        {
-            var context = new KanContextBuilder()
-                .SetGraphicsEngine(new GraphicsEngine(this))
-                .Build();
-
-            _graphics = new GraphicsDeviceManager(this);
-            _engine = new GameEngine(this, context);
-        }
-
-        protected override void Initialize()
-        {
-            IsMouseVisible = true;
-
-            base.Initialize();
-        }
-
-        protected override void Update(GameTime gameTime)
-        {
-            _engine.Update(gameTime.ElapsedGameTime);
-            base.Update(gameTime);
-        }
-
-        protected override void Draw(GameTime gameTime)
-        {
-            _engine.Draw(gameTime.ElapsedGameTime);
-            base.Draw(gameTime);
+            using (var game = new MonogameEngine(new GameConfiguration()))
+                game.Run();            
         }
 
     }

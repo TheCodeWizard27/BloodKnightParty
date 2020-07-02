@@ -1,14 +1,11 @@
-﻿using BloodKnightParty.src.Debugging;
+﻿using KantanEngine.Debugging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BloodKnightParty.Core.IO
+namespace KantanEngine.IO
 {
     internal enum FileType 
     {
@@ -58,7 +55,7 @@ namespace BloodKnightParty.Core.IO
                     switch (item.Key)
                     {
                         case FileType.KCPPackage:
-                            LoadKCPPackage(item.Value);
+                            LoadPackage(item.Value);
                             break;
                         default:
                             break;
@@ -87,7 +84,7 @@ namespace BloodKnightParty.Core.IO
             }
         }
 
-        private void LoadKCPPackage(string path)
+        private void LoadPackage(string path)
         {
             using (var fs = new FileStream(path, FileMode.Open))
             using (var gzip = new GZipStream(fs, CompressionMode.Decompress))
@@ -95,15 +92,21 @@ namespace BloodKnightParty.Core.IO
                 using(var sr = new StreamReader(gzip))
                 {
                     var tmpRessources = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
-                    //CopyDictionarToTarget(tmpRessources);
+                    CopyDictionaryToTarget(tmpRessources);
                 }
             }
         }
 
-        private void CopyDictionarToTarget(Dictionary<string, Stream> dict)
+        private void CopyDictionaryToTarget(Dictionary<string, string> dict)
         {
             foreach(var item in dict)
-                OnLoad?.Invoke(item.Key, item.Value);
+                using(var memStream = new MemoryStream())
+                {
+                    using (var sw = new StreamWriter(memStream))
+                        sw.Write(item.Value);
+                    
+                    OnLoad?.Invoke(item.Key, memStream);
+                }
         }
 
         #endregion

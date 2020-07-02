@@ -12,28 +12,43 @@ namespace KantanEngine.Core
 
         #endregion
 
-        public KanGameEngine(KanEngineContext context)
+        public KanGameEngine(IKanGameConfiguration configuration)
         {
-            Context = context;
+            Configure(configuration);
         }
 
         #region Public Methods
 
         public void ChangeController(KanGameController controller)
         {
-            CurrentController.Dispose();
+            Context.ClearLocal();
+            CurrentController?.Unload();
             CurrentController = controller;
             controller.Initialize();
         }
 
         public void Update(TimeSpan delta)
         {
-            CurrentController.Update(delta, Context);
+            Context.TimeDelta = delta;
+            CurrentController?.Update();
         }
 
         public void Draw(TimeSpan delta)
         {
-            CurrentController.Draw(delta, Context);
+            Context.TimeDelta = delta;
+            CurrentController?.Draw();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void Configure(IKanGameConfiguration configuration)
+        {
+            var contextBuilder = new KanEngineContextBuilder();
+            contextBuilder.SetControllerSwitchAction(ChangeController);
+            configuration?.Configure(this, contextBuilder);
+            Context = contextBuilder.Build();
         }
 
         #endregion

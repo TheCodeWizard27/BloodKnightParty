@@ -6,37 +6,25 @@ using System.Threading.Tasks;
 
 namespace KantanEngine.Core
 {
-    public class KanGameController
+    public abstract class KanGameController
     {
 
-        public KanGameEngine Engine { get; private set; }
+        protected KanEngineContext Context { get; private set; }
 
-        public KanGameController(KanGameEngine engine)
+        public KanGameController(KanEngineContext context)
         {
-            Engine = engine;
+            Context = context;
         }
 
         #region Public Methods
 
-        public void Initialize()
-        {
+        public abstract void Initialize();
 
-        }
+        public abstract void Update();
 
-        public void Update(TimeSpan delta, KanEngineContext context)
-        {
+        public abstract void Draw();
 
-        }
-
-        public void Draw(TimeSpan delta, KanEngineContext context)
-        {
-
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
+        public abstract void Unload();
 
         #endregion
 
