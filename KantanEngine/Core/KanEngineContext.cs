@@ -1,6 +1,7 @@
 ﻿using KantanEngine.Debugging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace KantanEngine.Core
 
         internal IKanServiceProvider _serviceProvider;
         internal Action<KanGameController> _switchController;
-        internal Dictionary<string, object> _localBuffer;
+        internal ServiceContainer _local = new ServiceContainer();
 
         #region Properties
 
@@ -26,15 +27,13 @@ namespace KantanEngine.Core
 
         #region Public Methods
 
-        public void ClearLocal() => _localBuffer.Clear();
-        public void SetLocal(string local, object value) => _localBuffer.Add(local, value);
-        public bool LocalExists(string local) => _localBuffer.ContainsKey(local);
-
-        public T GetLocal<T>(string local) => (T)_localBuffer[local];
-        public T TryGetLocal<T>(string local, T defaultValue = default)
+        public void ClearLocal()
         {
-            try { return TryGetLocal<T>(local); } catch { return defaultValue; }
+            _local = new ServiceContainer();
         }
+        public void AddLocal<T>(T local) => _local.AddService(typeof(T), local);
+
+        public T GetLocal<T>() => (T)_local.GetService(typeof(T));
 
         public T GetService<T>() where T : class => _serviceProvider.GetService<T>();
         public void RunService<T>(Action<T> action) where T : class => action.Invoke(GetService<T>());

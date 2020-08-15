@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BloodKnightParty.src.InputHandling
+namespace MonoKanEngine.src.Input
 {
-    public class InputBuffer
+    public class KeyboardHandler
     {
     }
 }

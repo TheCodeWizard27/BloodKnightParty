@@ -62,12 +62,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameConfiguration.cs" />
-    <Compile Include="src\InputHandling\GamepadHandler.cs" />
     <Compile Include="src\Core\TestController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\InputHandling\GamepadHelper.cs" />
-    <Compile Include="src\InputHandling\InputBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">

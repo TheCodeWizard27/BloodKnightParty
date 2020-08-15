@@ -12,7 +12,9 @@ namespace BloodKnightParty
     {
         public void Configure(KanGameEngine engine, KanEngineContextBuilder builder)
         {
-            
+            var inputHandler = new InputHandler();
+            inputHandler.StartListening();
+            builder.AddService(inputHandler);
         }
 
         public KanGameController Startup(KanEngineContext context)

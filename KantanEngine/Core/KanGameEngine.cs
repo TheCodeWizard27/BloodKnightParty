@@ -15,6 +15,7 @@ namespace KantanEngine.Core
         public KanGameEngine(IKanGameConfiguration configuration)
         {
             Configure(configuration);
+            ChangeController(configuration.Startup(Context));
         }
 
         #region Public Methods
