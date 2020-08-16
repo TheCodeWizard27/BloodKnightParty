@@ -10,15 +10,14 @@ namespace MonoKanEngine.src.Input
 {
 
     public class GamePadHandler
-    {
-
-        public static int X_THRESHOLD = 10;
-        public static int Y_THRESHOLD = 10;
+    { 
 
         protected GamePadState _bufferedGamePadState;
         protected GamePadState _currentGamePadState;
 
         public bool IsConnected { get => _currentGamePadState.IsConnected; }
+
+        public GamePadThumbSticks ThumbSticks { get => _currentGamePadState.ThumbSticks; }
 
         public int Id { get; private set; }
 
@@ -64,9 +63,6 @@ namespace MonoKanEngine.src.Input
             => _bufferedGamePadState.IsButtonUp(button) && _currentGamePadState.IsButtonDown(button);
         public bool IsButtonReleased(Buttons button)
             => _bufferedGamePadState.IsButtonDown(button) && _currentGamePadState.IsButtonUp(button);
-
-        public Vector2 GetLeftThumbStick() => _currentGamePadState.ThumbSticks.Left;
-        public Vector2 GetRightThumbStick() => _currentGamePadState.ThumbSticks.Left;
 
         public void UpdateGamePadState(GamePadState gamePadState)
         {

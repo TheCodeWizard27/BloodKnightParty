@@ -12,12 +12,60 @@ using System.Threading.Tasks;
 
 namespace BloodKnightParty.src.Core
 {
-    public class InputHandler
+
+    #region Keyboard
+    public class Keyboard
     {
 
-        protected CancellationTokenSource _cancelToken;
-        
-        protected GamePadHandler[] _gamePadHandlers;
+        private KeyboardHandler _keyboardHandler;
+
+        #region Events
+
+        public delegate void OnKeyDownHandler(Keys key);
+        public event OnKeyDownHandler OnKeyDown;
+
+        public delegate void OnKeyUpHandler(Keys key);
+        public event OnKeyUpHandler OnKeyUp;
+
+        public delegate void OnKeyPressedHandler(Keys key);
+        public event OnKeyDownHandler OnKeyPressed;
+
+        public delegate void OnKeyClickedHandler(Keys key);
+        public event OnKeyDownHandler OnKeyClicked;
+
+        public delegate void OnKeyReleasedHandler(Keys key);
+        public event OnKeyDownHandler OnKeyReleased;
+
+        #endregion
+
+        internal void InitKeyboardHandlers()
+        {
+            _keyboardHandler = new KeyboardHandler();
+
+            _keyboardHandler.OnKeyDown += (key) => OnKeyDown?.Invoke(key);
+            _keyboardHandler.OnKeyUp += (key) => OnKeyUp?.Invoke(key);
+            _keyboardHandler.OnKeyPressed += (key) => OnKeyPressed?.Invoke(key);
+            _keyboardHandler.OnKeyClicked += (key) => OnKeyClicked?.Invoke(key);
+            _keyboardHandler.OnKeyReleased += (key) => OnKeyReleased?.Invoke(key);
+        }
+
+        internal void PollKeyboard()
+        {
+            try
+            {
+                _keyboardHandler.UpdateKeyboardState(Microsoft.Xna.Framework.Input.Keyboard.GetState());
+            }
+            catch
+            {
+                Log.Default.WriteLine("KeyboardHandler Caught Exception");
+            }
+        }
+    }
+    #endregion
+
+    #region GamePads
+    public class GamePads
+    {
 
         #region Events
 
@@ -36,7 +84,7 @@ namespace BloodKnightParty.src.Core
         public delegate void OnButtonReleasedHandler(GamePadHandler handler, Buttons button, float value);
         public event OnButtonDownHandler OnButtonReleased;
 
-        public delegate void OnConnectionHandler (GamePadHandler handler);
+        public delegate void OnConnectionHandler(GamePadHandler handler);
         public event OnConnectionHandler OnConnection;
 
         public delegate void OnDisconnectedHandler(GamePadHandler handler);
@@ -45,45 +93,30 @@ namespace BloodKnightParty.src.Core
         #endregion
 
         public int MaxGamePads { get; private set; } = 4;
-        public int Interval { get; private set; } = 1000 / 60;
-        public bool GamePadPollingEnabled { get; set; } = true;
 
-        public InputHandler()
-        {
-            _gamePadHandlers = new GamePadHandler[MaxGamePads];
-        }
-
-
-        #region Public Methods
-
-        public void StartListening()
-        {
-            _cancelToken = new CancellationTokenSource();
-            var tmpToken = _cancelToken.Token;
-
-            Task.Factory.StartNew(() =>
-            {
-                InitGamePadHandlers();
-                do
-                {
-                    if(GamePadPollingEnabled) PollGamepads();
-
-                    Thread.Sleep(Interval);
-                } while (!tmpToken.IsCancellationRequested);
-            }, tmpToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            Log.Default.WriteLine("InputHandler Attached");
-        }
-
-        public void StopListening() => _cancelToken.Cancel();
+        protected GamePadHandler[] _gamePadHandlers;
 
         public GamePadHandler GetGamePad(int id) => _gamePadHandlers[id];
 
-        #endregion
-
-        #region Private Methods
-
-        private void InitGamePadHandlers()
+        internal void PollGamepads()
         {
+            try
+            {
+                for (var i = 0; i < MaxGamePads; i++)
+                {
+                    _gamePadHandlers[i].UpdateGamePadState(GamePad.GetState(i));
+                }
+            }
+            catch
+            {
+                Log.Default.WriteLine("GamepadHandler Caught Exception");
+            }
+
+        }
+
+        internal void InitGamePadHandlers()
+        {
+            _gamePadHandlers = new GamePadHandler[MaxGamePads];
             for (int i = 0; i < MaxGamePads; i++)
             {
                 var handle = _gamePadHandlers[i] = new GamePadHandler(i);
@@ -97,24 +130,53 @@ namespace BloodKnightParty.src.Core
                 handle.OnButtonPressed += (button, value) => OnButtonPressed?.Invoke(handle, button, value);
                 handle.OnButtonClicked += (button, value) => OnButtonClicked?.Invoke(handle, button, value);
                 handle.OnButtonReleased += (button, value) => OnButtonReleased?.Invoke(handle, button, value);
-
             }
         }
 
-        private void PollGamepads()
+    }
+    #endregion
+
+    public class InputHandler
+    {
+
+        protected CancellationTokenSource _cancelToken;
+        
+        public int Interval { get; private set; } = 1000 / 60;
+        public bool GamePadPollingEnabled { get; set; } = true;
+
+        public GamePads GamePads { get; private set; }
+        public Keyboard Keyboard { get; private set; }
+
+        public InputHandler()
         {
-            try
-            {
-                for (var i = 0; i < MaxGamePads; i++)
-                {
-                    _gamePadHandlers[i].UpdateGamePadState(GamePad.GetState(i));
-                }
-            } catch
-            {
-                Log.Default.WriteLine("GamepadHandler Caught Exception");
-            }
-
+            GamePads = new GamePads();
+            Keyboard = new Keyboard();
         }
+
+
+        #region Public Methods
+
+        public void StartListening()
+        {
+            _cancelToken = new CancellationTokenSource();
+            var tmpToken = _cancelToken.Token;
+
+            Task.Factory.StartNew(() =>
+            {
+                GamePads.InitGamePadHandlers();
+                Keyboard.InitKeyboardHandlers();
+
+                do
+                {
+                    if(GamePadPollingEnabled) GamePads.PollGamepads();
+                    Keyboard.PollKeyboard();
+                    Thread.Sleep(Interval);
+                } while (!tmpToken.IsCancellationRequested);
+            }, tmpToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Log.Default.WriteLine("InputHandler Attached");
+        }
+
+        public void StopListening() => _cancelToken.Cancel();
 
         #endregion
 

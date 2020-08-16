@@ -19,7 +19,7 @@ namespace BloodKnightParty
 
         public KanGameController Startup(KanEngineContext context)
         {
-            return new TestController(context);
+            return new InputTestController(context);
         }
     }
 }

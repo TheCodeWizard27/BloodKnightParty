@@ -62,7 +62,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameConfiguration.cs" />
-    <Compile Include="src\Core\TestController.cs" />
+    <Compile Include="src\Core\InputTestController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
