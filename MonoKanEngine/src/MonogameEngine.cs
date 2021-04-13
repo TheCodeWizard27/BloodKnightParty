@@ -1,5 +1,6 @@
 ﻿using KantanEngine.Core;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,20 @@ namespace MonoKanEngine.src
     {
         private KanGameEngine _engine;
         private IKanGameConfiguration _configuration;
-        
+
         public GraphicsDeviceManager GraphicsDeviceManager { get; set; }
 
         public MonogameEngine(IKanGameConfiguration configuration)
         {
             Initialize();
             _configuration = configuration;
-            _engine = new KanGameEngine(this);
+            
         }
 
         protected override void LoadContent()
         {
             base.LoadContent();
+            _engine = new KanGameEngine(this);
         }
 
         protected override void Update(GameTime gameTime) => _engine?.Update(gameTime.ElapsedGameTime);
@@ -34,12 +36,14 @@ namespace MonoKanEngine.src
         {
             IsMouseVisible = true;
             GraphicsDeviceManager = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            Content.RootDirectory = "Packages";
         }
 
         public void Configure(KanGameEngine engine, KanEngineContextBuilder builder)
         {
             builder.SetServiceProvider(new MonogameServiceProvider(this));
+            builder.Services.AddService(GraphicsDeviceManager);
+            builder.Services.AddService(new KanContentManager(builder.Services));
             _configuration.Configure(engine, builder); // Forward configuration to final implementation
         }
 

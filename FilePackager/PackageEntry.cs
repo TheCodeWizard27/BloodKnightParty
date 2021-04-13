@@ -9,7 +9,6 @@ namespace FilePackager
     public class PackageEntry
     {
 
-        public string Output { get; set; }
         public Func<string, string> NameFilter { get; set; }
 
     }

@@ -9,8 +9,8 @@ namespace FilePackager
         static void Main(string[] args)
         {
             new Packager()
-                .Prepare()
-                .Create();
+                .AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\windows\")
+                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\test.kco");
             Console.WriteLine("Done!");
             Console.ReadLine();
         }

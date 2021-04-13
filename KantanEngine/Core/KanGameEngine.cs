@@ -23,21 +23,26 @@ namespace KantanEngine.Core
         public void ChangeController(KanGameController controller)
         {
             Context.ClearLocal();
-            CurrentController?.Unload();
+
+            CurrentController?.Unload(); // Do the generic unloading.
+            CurrentController?.OnUnload();
+
             CurrentController = controller;
-            controller.Initialize();
+            controller.OnInitialize();
         }
 
         public void Update(TimeSpan delta)
         {
             Context.TimeDelta = delta;
-            CurrentController?.Update();
+
+            CurrentController?.Update(); // Do the generic update.
+            CurrentController?.OnUpdate();
         }
 
         public void Draw(TimeSpan delta)
         {
             Context.TimeDelta = delta;
-            CurrentController?.Draw();
+            CurrentController?.OnDraw();
         }
 
         #endregion

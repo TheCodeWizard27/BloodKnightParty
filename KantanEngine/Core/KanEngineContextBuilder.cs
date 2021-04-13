@@ -11,6 +11,8 @@ namespace KantanEngine.Core
 
         private KanEngineContext _kanEngineContext;
 
+        public IKanServiceProvider Services { get => _kanEngineContext._serviceProvider; }
+
         public KanEngineContextBuilder()
         {
             _kanEngineContext = new KanEngineContext();
@@ -24,11 +26,6 @@ namespace KantanEngine.Core
         public KanEngineContextBuilder SetControllerSwitchAction(Action<KanGameController> controllerSwitch)
         {
             _kanEngineContext._switchController = controllerSwitch;
-            return this;
-        }
-        public KanEngineContextBuilder AddService<ServiceType>(ServiceType service) where ServiceType : class
-        {
-            _kanEngineContext._serviceProvider.AddService(service);
             return this;
         }
 

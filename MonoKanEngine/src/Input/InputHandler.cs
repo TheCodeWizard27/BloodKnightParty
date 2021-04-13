@@ -57,7 +57,7 @@ namespace BloodKnightParty.src.Core
             }
             catch
             {
-                Log.Default.WriteLine("KeyboardHandler Caught Exception");
+                Log.Default.Write("KeyboardHandler Caught Exception");
             }
         }
     }
@@ -109,7 +109,7 @@ namespace BloodKnightParty.src.Core
             }
             catch
             {
-                Log.Default.WriteLine("GamepadHandler Caught Exception");
+                Log.Default.Write("GamepadHandler Caught Exception");
             }
 
         }
@@ -173,7 +173,7 @@ namespace BloodKnightParty.src.Core
                     Thread.Sleep(Interval);
                 } while (!tmpToken.IsCancellationRequested);
             }, tmpToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            Log.Default.WriteLine("InputHandler Attached");
+            Log.Default.Write("InputHandler Attached");
         }
 
         public void StopListening() => _cancelToken.Cancel();

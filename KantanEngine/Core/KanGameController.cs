@@ -18,13 +18,21 @@ namespace KantanEngine.Core
 
         #region Public Methods
 
-        public abstract void Initialize();
+        public abstract void OnInitialize();
 
-        public abstract void Update();
+        public void Update()
+        {
+            Context.ObjectTracker.UpdateTracked();
+        }
+        public abstract void OnUpdate();
 
-        public abstract void Draw();
+        public abstract void OnDraw();
 
-        public abstract void Unload();
+        public void Unload()
+        {
+            Context.ObjectTracker.Clear();
+        }
+        public abstract void OnUnload();
 
         #endregion
 

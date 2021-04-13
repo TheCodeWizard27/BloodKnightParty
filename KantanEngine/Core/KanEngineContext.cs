@@ -1,4 +1,5 @@
 ﻿using KantanEngine.Debugging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace KantanEngine.Core
 {
+
     public class KanEngineContext
     {
 
@@ -18,11 +20,13 @@ namespace KantanEngine.Core
         #region Properties
 
         public TimeSpan TimeDelta { get; internal set; }
+        public KanObjectTracker ObjectTracker { get; internal set; } = new KanObjectTracker();
 
         #endregion
 
         internal KanEngineContext()
         {
+
         }
 
         #region Public Methods
@@ -31,8 +35,12 @@ namespace KantanEngine.Core
         {
             _local = new ServiceContainer();
         }
+        public void AddLocal<T>(Type type)
+        {
+            var instance = ActivatorUtilities.CreateInstance(_local, typeof(T));
+            _local.AddService(typeof(T), instance);
+        }
         public void AddLocal<T>(T local) => _local.AddService(typeof(T), local);
-
         public T GetLocal<T>() => (T)_local.GetService(typeof(T));
 
         public T GetService<T>() where T : class => _serviceProvider.GetService<T>();

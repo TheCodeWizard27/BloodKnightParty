@@ -16,7 +16,7 @@ namespace KantanEngine.Debugging
 
         private Log() { }
 
-        public void WriteLine(string message)
+        public void Write(string message)
         {
             OnLogEvent?.Invoke(message);
         }

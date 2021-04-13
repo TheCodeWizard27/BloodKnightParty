@@ -1,6 +1,9 @@
 ﻿using KantanEngine.Core;
 using KantanEngine.Debugging;
+using KantanEngine.IO;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoKanEngine.src;
 using MonoKanEngine.src.Input;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +21,16 @@ namespace BloodKnightParty.src.Core
 
         }
 
-        public override void Draw()
+        public override void OnDraw()
         {
             //throw new System.NotImplementedException();
         }
 
-        public override void Initialize()
+        public override void OnInitialize()
         {
+            var loader = Context.GetService<KanContentManager>();
+            loader.Loader.AddPackageToQueue("Ressources/test.kco");
+            loader.Loader.LoadAsync().Wait();
 
             Context.RunService<InputHandler>(input =>
             {
@@ -38,7 +44,7 @@ namespace BloodKnightParty.src.Core
             });
         }
 
-        public override void Unload()
+        public override void OnUnload()
         {
 
             Context.RunService<InputHandler>(input =>
@@ -53,8 +59,9 @@ namespace BloodKnightParty.src.Core
             });
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
+            /*
             var test = "[";
             foreach(var button in _bufferedInput.ToList())
             {
@@ -62,7 +69,7 @@ namespace BloodKnightParty.src.Core
             }
 
             Log.Default.WriteLine($"{test}]");
-
+            */
         }
 
         public void KeyDown(Keys key) => _bufferedInput.Add(key);
@@ -73,12 +80,12 @@ namespace BloodKnightParty.src.Core
 
         private void Connected(GamePadHandler handler)
         {
-            Log.Default.WriteLine("Connection Made");
+            Log.Default.Write("Connection Made");
         }
 
         private void Disconnected(GamePadHandler handler)
         {
-            Log.Default.WriteLine("Disconnected");
+            Log.Default.Write("Disconnected");
         }
     }
 }
