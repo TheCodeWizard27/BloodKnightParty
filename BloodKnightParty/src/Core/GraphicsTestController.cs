@@ -17,17 +17,18 @@ namespace BloodKnightParty.src.Core
 {
     public class GraphicsTestController : KanGameController
     {
-
-        //private HashSet<Buttons> _bufferedInput = new HashSet<Buttons>();
         private HashSet<Keys> _bufferedInput = new HashSet<Keys>();
 
-        private VertexPositionTexture[] _floorVerts;
         private BasicEffect _effect;
-        private Vector3 _cameraPos = new Vector3(0, 40, 20);
-        private float _rotation = 0;
 
-        private float currY = 0;
-        private float MaxY = 500;
+        private Vector3 _cameraPos = new Vector3(0, 40, 20);
+        private Vector3 _cameraRot = new Vector3(0, 0, 0);
+        private double _maxLookUp = 90 * Math.PI / 180;
+        private double _maxLookDown = -90 * Math.PI / 180;
+
+        private float _cameraSensitivity = .5f;
+
+        private Vector2 _middleOfScreen;
 
         private Model _model;
 
@@ -41,11 +42,12 @@ namespace BloodKnightParty.src.Core
             {
                 gdm.GraphicsDevice.Clear(Color.LightBlue);
 
-                _cameraPos.Y = currY;
+                _cameraRot.Y = (float) Math.Min(Math.Max(_cameraRot.Y, _maxLookDown), _maxLookUp);
 
                 var cameraPosition = _cameraPos;
-                var cameraLookAtVector = _cameraPos + Vector3.Down;// Matrix.CreateRotationY(1.4f).Forward;
-                var cameraUpVector = Vector3.UnitZ;
+                var cameraRotation = Matrix.CreateFromYawPitchRoll(_cameraRot.X, _cameraRot.Y, 0);
+                var cameraLookAtVector = _cameraPos + Vector3.Transform( Vector3.Forward, cameraRotation);
+                var cameraUpVector = Vector3.Up;
 
                 _effect.View = Matrix.CreateLookAt(
                     cameraPosition, cameraLookAtVector, cameraUpVector);
@@ -66,6 +68,18 @@ namespace BloodKnightParty.src.Core
                 //gdm.GraphicsDevice.SamplerStates[0].MipFilter = TextureFilter.Linear;
                 //gdm.GraphicsDevice.SamplerStates[0].MaxAnisotropy = 16;
 
+                
+                if (Context.GetService<Game>().IsActive)
+                {
+                    var movement = _middleOfScreen - (Mouse.GetState().Position.ToVector2());
+
+                    _cameraRot.X += (movement.X * _cameraSensitivity) * ((float)Math.PI / 180);
+                    _cameraRot.Y += (movement.Y * _cameraSensitivity) * ((float)Math.PI / 180);
+
+                    Log.Default.Write($"CameraRot X {_cameraRot.X} , Y {_cameraRot.Y}");
+
+                    Mouse.SetPosition((int)_middleOfScreen.X, (int)_middleOfScreen.Y);
+                }
 
                 foreach (var pass in _effect.CurrentTechnique.Passes)
                 {
@@ -95,20 +109,11 @@ namespace BloodKnightParty.src.Core
             _model = loader.Load<Model>("test.xnb");
 
             var gdm = Context.GetService<GraphicsDeviceManager>();
-
-            _floorVerts = new VertexPositionTexture[6];
-
-            _floorVerts[0].Position = new Vector3(-20, -20, 0);
-            _floorVerts[1].Position = new Vector3(-20, 20, 0);
-            _floorVerts[2].Position = new Vector3(20, -20, 0);
-
-            _floorVerts[3].Position = _floorVerts[1].Position;
-            _floorVerts[4].Position = new Vector3(20, 20, 0);
-            _floorVerts[5].Position = _floorVerts[2].Position;
-
             _effect = new BasicEffect(gdm.GraphicsDevice);
-            
             _effect.FogEnabled = false;
+
+            var viewPort = Context.GetService<Game>().GraphicsDevice.Viewport;
+            _middleOfScreen = new Vector2(viewPort.Width/2, viewPort.Height/2);
 
             Context.RunService<InputHandler>(input =>
             {
@@ -121,38 +126,43 @@ namespace BloodKnightParty.src.Core
 
         private void Keyboard_OnKeyDown(Keys key) => _bufferedInput.Remove(key);
 
-        public override void OnUnload()
-        {
-        }
-
         public override void OnUpdate()
         {
+            var cameraRotation = Matrix.CreateFromYawPitchRoll(_cameraRot.X, 0, 0);
+            var direction = new Vector3();
+
             _bufferedInput.ToList().ForEach(key =>
             {
                 switch (key)
                 {
                     case Keys.W:
-                        _cameraPos.X += 1;
+                        direction.Z += 1;
                         break;
                     case Keys.S:
-                        _cameraPos.X -= 1;
+                        direction.Z -= 1;
                         break;
                     case Keys.A:
-                        currY += 1;
+                        direction.X += 1;
                         break;
                     case Keys.D:
-                        currY -= 1;
+                        direction.X -= 1;
                         break;
                     case Keys.Space:
-                        _cameraPos.Z += 1;
+                        direction.Y -= 1;
                         break;
                     case Keys.LeftShift:
-                        _cameraPos.Z -= 1;
+                        direction.Y += 1;
                         break;
                 }
             });
 
-            Log.Default.Write($"{{ x: {_cameraPos.X} y:{_cameraPos.Y} z:{_cameraPos.Z} }}");
+            var moveTo = Vector3.Transform(direction, cameraRotation);
+            _cameraPos += moveTo;
+        }
+
+        public override void OnUnload()
+        {
+            
         }
     }
 }

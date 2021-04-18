@@ -34,14 +34,16 @@ namespace MonoKanEngine.src
 
         private new void Initialize()
         {
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             GraphicsDeviceManager = new GraphicsDeviceManager(this);
+            GraphicsDeviceManager.ToggleFullScreen();
             Content.RootDirectory = "Packages";
         }
 
         public void Configure(KanGameEngine engine, KanEngineContextBuilder builder)
         {
             builder.SetServiceProvider(new MonogameServiceProvider(this));
+            builder.Services.AddService<Game>(this);
             builder.Services.AddService(GraphicsDeviceManager);
             builder.Services.AddService(new KanContentManager(builder.Services));
             _configuration.Configure(engine, builder); // Forward configuration to final implementation
