@@ -41,21 +41,10 @@ namespace BloodKnightParty.src.Core
             {
                 gdm.GraphicsDevice.Clear(Color.LightBlue);
 
-                /*
-                if (currY < MaxY)
-                {
-                    currY += 0.1f;
-                }
-                else
-                {
-                    currY = 0;
-                }
-                */
-
                 _cameraPos.Y = currY;
 
                 var cameraPosition = _cameraPos;
-                var cameraLookAtVector = _cameraPos + Matrix.CreateRotationY(1.4f).Forward;
+                var cameraLookAtVector = _cameraPos + Vector3.Down;// Matrix.CreateRotationY(1.4f).Forward;
                 var cameraUpVector = Vector3.UnitZ;
 
                 _effect.View = Matrix.CreateLookAt(
@@ -76,7 +65,6 @@ namespace BloodKnightParty.src.Core
                 //gdm.GraphicsDevice.SamplerStates[0].MagFilter = TextureFilter.Anisotropic;
                 //gdm.GraphicsDevice.SamplerStates[0].MipFilter = TextureFilter.Linear;
                 //gdm.GraphicsDevice.SamplerStates[0].MaxAnisotropy = 16;
-                _effect.SpecularPower = 1;
 
 
                 foreach (var pass in _effect.CurrentTechnique.Passes)
@@ -90,21 +78,10 @@ namespace BloodKnightParty.src.Core
                             effect.View = _effect.View;
                             effect.Projection = _effect.Projection;
                             effect.Alpha = 1;
-                            //effect.EnableDefaultLighting();
                         }
 
                         mesh.Draw();  
                     }
-                    /*
-                    gdm.GraphicsDevice.DrawUserPrimitives(
-                        PrimitiveType.TriangleList,
-                        _floorVerts,
-                        // The offset, which is 0 since we want to start
-                        // at the beginning of the floorVerts array
-                        0,
-                        // The number of triangles to draw
-                        2);
-                    */
                 }
             });
         }
