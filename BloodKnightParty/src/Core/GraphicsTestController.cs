@@ -19,12 +19,14 @@ namespace BloodKnightParty.src.Core
     {
         private HashSet<Keys> _bufferedInput = new HashSet<Keys>();
 
-        private BasicEffect _effect;
+        private Effect _effect;
 
         private Vector3 _cameraPos = new Vector3(0, 40, 20);
         private Vector3 _cameraRot = new Vector3(0, 0, 0);
-        private double _maxLookUp = 90 * Math.PI / 180;
-        private double _maxLookDown = -90 * Math.PI / 180;
+        private double _maxLookUp = 89 * Math.PI / 180;
+        private double _maxLookDown = -89 * Math.PI / 180;
+
+        private int _speed = 10;
 
         private float _cameraSensitivity = .5f;
 
@@ -40,7 +42,7 @@ namespace BloodKnightParty.src.Core
         {
             Context.RunService<GraphicsDeviceManager>(gdm =>
             {
-                gdm.GraphicsDevice.Clear(Color.LightBlue);
+                gdm.GraphicsDevice.Clear(Color.Black);
 
                 _cameraRot.Y = (float) Math.Min(Math.Max(_cameraRot.Y, _maxLookDown), _maxLookUp);
 
@@ -49,18 +51,19 @@ namespace BloodKnightParty.src.Core
                 var cameraLookAtVector = _cameraPos + Vector3.Transform( Vector3.Forward, cameraRotation);
                 var cameraUpVector = Vector3.Up;
 
-                _effect.View = Matrix.CreateLookAt(
-                    cameraPosition, cameraLookAtVector, cameraUpVector);
+                _effect.Parameters["World"].SetValue(Matrix.CreateTranslation(0, 0, 0));
+                _effect.Parameters["View"].SetValue(Matrix.CreateLookAt(
+                    cameraPosition, cameraLookAtVector, cameraUpVector));
 
                 float aspectRatio =
                     gdm.PreferredBackBufferWidth / (float)gdm.PreferredBackBufferHeight;
                 float fieldOfView = MathHelper.PiOver4;
-                float nearClipPlane = 0.01f;
+                float nearClipPlane = 1f;
                 float farClipPlane = 100000;
 
-                _effect.TextureEnabled = true;
-                _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-                    fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
+                //_effect.TextureEnabled = true;
+                _effect.Parameters["Projection"].SetValue(Matrix.CreatePerspectiveFieldOfView(
+                    fieldOfView, aspectRatio, nearClipPlane, farClipPlane));
                 
                 gdm.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
                 //gdm.GraphicsDevice.SamplerStates[0].MinFilter = TextureFilter.Anisotropic;
@@ -73,10 +76,13 @@ namespace BloodKnightParty.src.Core
                 {
                     var movement = _middleOfScreen - (Mouse.GetState().Position.ToVector2());
 
-                    _cameraRot.X += (movement.X * _cameraSensitivity) * ((float)Math.PI / 180);
-                    _cameraRot.Y += (movement.Y * _cameraSensitivity) * ((float)Math.PI / 180);
+                    var delta = Context.TimeDelta.Milliseconds / 16;
+                    //Log.Default.Write($"Miliseconds {Context.TimeDelta.Milliseconds}");
 
-                    Log.Default.Write($"CameraRot X {_cameraRot.X} , Y {_cameraRot.Y}");
+                    _cameraRot.X += (movement.X * _cameraSensitivity *delta) * ((float)Math.PI / 180);
+                    _cameraRot.Y += (movement.Y * _cameraSensitivity *delta) * ((float)Math.PI / 180);
+
+                    //Log.Default.Write($"CameraRot X {_cameraRot.X} , Y {_cameraRot.Y}");
 
                     Mouse.SetPosition((int)_middleOfScreen.X, (int)_middleOfScreen.Y);
                 }
@@ -85,16 +91,25 @@ namespace BloodKnightParty.src.Core
                 {
                     pass.Apply();
 
-                    foreach(var mesh in _model.Meshes)
+                    foreach (var mesh in _model.Meshes)
                     {
+                        /*
+                        foreach(var part in mesh.MeshParts)
+                        {
+                            
+                        }
+                        */
+                        /*
                         foreach(BasicEffect effect in mesh.Effects)
                         {
+                            effect.EnableDefaultLighting();
                             effect.View = _effect.View;
                             effect.Projection = _effect.Projection;
                             effect.Alpha = 1;
                         }
+                        */
 
-                        mesh.Draw();  
+                        mesh.Draw();
                     }
                 }
             });
@@ -106,11 +121,29 @@ namespace BloodKnightParty.src.Core
             loader.Loader.AddPackageToQueue("Packages/test.kco");
             loader.Loader.LoadAsync().Wait();
 
-            _model = loader.Load<Model>("test.xnb");
+            _model = loader.Load<Model>("Map");
 
             var gdm = Context.GetService<GraphicsDeviceManager>();
-            _effect = new BasicEffect(gdm.GraphicsDevice);
-            _effect.FogEnabled = false;
+            _effect = loader.Load<Effect>("Shaders/test");
+            //_effect = new BasicEffect(gdm.GraphicsDevice);
+            //_effect.EnableDefaultLighting();
+            //_effect.TextureEnabled = true;
+            //_effect.LightingEnabled = true;
+            //_effect.DirectionalLight0.Enabled = true;
+            //_effect.DirectionalLight0.DiffuseColor = Color.Red.ToVector3();
+            //_effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(0, -1.5f, -1));
+            //_effect.DirectionalLight0.SpecularColor = Color.White.ToVector3();
+            //_effect.FogEnabled = false;
+
+            foreach(var model in _model.Meshes)
+            {
+                foreach(var part in model.MeshParts)
+                {
+                    part.Effect = _effect;
+                }
+            }
+
+            //gdm.GraphicsDevice.Viewport = new Viewport(0, 0, 165, 124);
 
             var viewPort = Context.GetService<Game>().GraphicsDevice.Viewport;
             _middleOfScreen = new Vector2(viewPort.Width/2, viewPort.Height/2);
@@ -133,25 +166,33 @@ namespace BloodKnightParty.src.Core
 
             _bufferedInput.ToList().ForEach(key =>
             {
+
                 switch (key)
                 {
+                    case Keys.Up:
+                        _speed += 1;
+                        break;
+                    case Keys.Down:
+                        _speed -= 1;
+                        break;
+
                     case Keys.W:
-                        direction.Z += 1;
+                        direction.Z += _speed;
                         break;
                     case Keys.S:
-                        direction.Z -= 1;
+                        direction.Z -= _speed;
                         break;
                     case Keys.A:
-                        direction.X += 1;
+                        direction.X += _speed;
                         break;
                     case Keys.D:
-                        direction.X -= 1;
+                        direction.X -= _speed;
                         break;
                     case Keys.Space:
-                        direction.Y -= 1;
+                        direction.Y -= _speed;
                         break;
                     case Keys.LeftShift:
-                        direction.Y += 1;
+                        direction.Y += _speed;
                         break;
                 }
             });

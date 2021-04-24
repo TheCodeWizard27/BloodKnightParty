@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace FilePackager
 {
@@ -11,11 +12,27 @@ namespace FilePackager
         static void Main(string[] args)
         {
 
+            BuildMGCB();
+
+            new Packager()
+                //.AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\windows\")
+                .AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\DesktopGL\")
+                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\test.kco");
+            Console.WriteLine("Done!");
+            Console.ReadLine();
+        }
+
+        private static void BuildMGCB()
+        {
             var buildProcess = new Process()
             {
                 StartInfo = new ProcessStartInfo(MGCB_PATH)
                 {
-                    Arguments = $"/build:\"{CONTENT_PATH}\""
+                    WorkingDirectory = Path.GetDirectoryName(CONTENT_PATH),
+                    Arguments = $"/clean /@:\"{CONTENT_PATH}\"",
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
                 }
             };
 
@@ -23,13 +40,20 @@ namespace FilePackager
             buildProcess.Start();
             Console.WriteLine("Building MGCB ...");
             buildProcess.WaitForExit();
-            Console.WriteLine("Done building MGCB!");
 
-            new Packager()
-                .AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\windows\")
-                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\test.kco");
-            Console.WriteLine("Done!");
-            Console.ReadLine();
+            while(!buildProcess.StandardOutput.EndOfStream)
+            {
+                Console.WriteLine(buildProcess.StandardOutput.ReadLine());
+            }
+
+            if (buildProcess.ExitCode != 0)
+            {
+                Console.WriteLine("An error occurred while building MGCB");
+                Console.WriteLine("Press <Enter> to continue build anyway.");
+                Console.ReadLine();
+                return;
+            }
+            Console.WriteLine("Done building MGCB!");
         }
 
     }

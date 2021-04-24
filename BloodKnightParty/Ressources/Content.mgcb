@@ -3,7 +3,7 @@
 
 /outputDir:bin/$(Platform)
 /intermediateDir:obj/$(Platform)
-/platform:Windows
+/platform:DesktopGL
 /config:
 /profile:Reach
 /compress:False
@@ -13,7 +13,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin test.fbx
+#begin Map.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -29,6 +29,12 @@
 /processorParam:RotationZ=0
 /processorParam:Scale=100
 /processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=NoChange
-/build:test.fbx
+/processorParam:TextureFormat=Compressed
+/build:Map.fbx
+
+#begin Shaders/test.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/test.fx
 

@@ -97,6 +97,8 @@ namespace KantanEngine.IO
             using (var stream = new MemoryStream())
             {
                 await fs.CopyToAsync(stream);
+                // TODO Implement this.
+                //_bufferedRessources.Add(GetRelativeFileName(path, ), stream.ToArray());
                 //OnLoad?.Invoke(Path.GetFileNameWithoutExtension(path), stream);
             }
         }
@@ -118,12 +120,12 @@ namespace KantanEngine.IO
                     }
                     */
 
-                    await CopyDictionaryToTargetAsync(tmpRessources);
+                    CopyDictionaryToTarget(tmpRessources);
                 }
             }
         }
 
-        private Task CopyDictionaryToTargetAsync(Dictionary<string, byte[]> dict)
+        private void CopyDictionaryToTarget(Dictionary<string, byte[]> dict)
         {
             foreach (var item in dict)
             {
@@ -139,8 +141,13 @@ namespace KantanEngine.IO
                 //    OnLoad?.Invoke(item.Key, memStream);
                 //}
             }
+        }
 
-            return Task.CompletedTask;
+        private string GetRelativeFileName(string directory, string file)
+        {
+            var dirUri = new Uri(directory);
+            var fileUri = new Uri(file);
+            return dirUri.MakeRelativeUri(fileUri).OriginalString;
         }
 
         #endregion
