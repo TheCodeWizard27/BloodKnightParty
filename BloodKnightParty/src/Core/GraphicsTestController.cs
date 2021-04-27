@@ -28,6 +28,9 @@ namespace BloodKnightParty.src.Core
 
         private int _speed = 10;
 
+        private float zNear = 0.1f;
+        private float zFar = 100f;
+
         private float _cameraSensitivity = .5f;
 
         private Vector2 _middleOfScreen;
@@ -58,7 +61,7 @@ namespace BloodKnightParty.src.Core
                 float aspectRatio =
                     gdm.PreferredBackBufferWidth / (float)gdm.PreferredBackBufferHeight;
                 float fieldOfView = MathHelper.PiOver4;
-                float nearClipPlane = 1f;
+                float nearClipPlane = 0.1f;
                 float farClipPlane = 100000;
 
                 //_effect.TextureEnabled = true;
@@ -118,35 +121,31 @@ namespace BloodKnightParty.src.Core
         public override void OnInitialize()
         {
             var loader = Context.GetService<KanContentManager>();
-            loader.Loader.AddPackageToQueue("Packages/test.kco");
+            loader.Loader.AddPackageToQueue("Packages/map.kco");
+            loader.Loader.AddPackageToQueue("Packages/shader.kco");
             loader.Loader.LoadAsync().Wait();
 
             _model = loader.Load<Model>("Map");
 
             var gdm = Context.GetService<GraphicsDeviceManager>();
-            _effect = loader.Load<Effect>("Shaders/test");
-            //_effect = new BasicEffect(gdm.GraphicsDevice);
-            //_effect.EnableDefaultLighting();
-            //_effect.TextureEnabled = true;
-            //_effect.LightingEnabled = true;
-            //_effect.DirectionalLight0.Enabled = true;
-            //_effect.DirectionalLight0.DiffuseColor = Color.Red.ToVector3();
-            //_effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(0, -1.5f, -1));
-            //_effect.DirectionalLight0.SpecularColor = Color.White.ToVector3();
-            //_effect.FogEnabled = false;
+            //gdm.GraphicsDevice.Viewport = new Viewport(0, 0, 1080, 780);
+            var viewPort = gdm.GraphicsDevice.Viewport;
+            _middleOfScreen = new Vector2(viewPort.Width / 2, viewPort.Height / 2);
 
-            foreach(var model in _model.Meshes)
+            var ditherTex = loader.Load<Texture2D>("Shaders/BayerDither8x8");
+            _effect = loader.Load<Effect>("Shaders/test");
+            _effect.Parameters["DitherPattern"].SetValue(ditherTex);
+            _effect.Parameters["DitherPatternSize"].SetValue(new Vector4(64));
+            _effect.Parameters["ScreenParams"].SetValue(new Vector4(viewPort.Width, viewPort.Height, 1.0f + 1.0f/ viewPort.Width, 1.0f + 1.0f/ viewPort.Height));
+            _effect.Parameters["ProjectionParams"].SetValue(new Vector4(1, 0.1f, 10000, 1/ 100000));
+
+            foreach (var model in _model.Meshes)
             {
                 foreach(var part in model.MeshParts)
                 {
                     part.Effect = _effect;
                 }
             }
-
-            //gdm.GraphicsDevice.Viewport = new Viewport(0, 0, 165, 124);
-
-            var viewPort = Context.GetService<Game>().GraphicsDevice.Viewport;
-            _middleOfScreen = new Vector2(viewPort.Width/2, viewPort.Height/2);
 
             Context.RunService<InputHandler>(input =>
             {
@@ -176,6 +175,20 @@ namespace BloodKnightParty.src.Core
                         _speed -= 1;
                         break;
 
+                    case Keys.NumPad7:
+                        zNear -= 1;
+                        break;
+                    case Keys.NumPad8:
+                        zNear += 1;
+                        break;
+
+                    case Keys.NumPad4:
+                        zFar -= 0.1f;
+                        break;
+                    case Keys.NumPad5:
+                        zFar += 0.1f;
+                        break;
+
                     case Keys.W:
                         direction.Z += _speed;
                         break;
@@ -199,6 +212,17 @@ namespace BloodKnightParty.src.Core
 
             var moveTo = Vector3.Transform(direction, cameraRotation);
             _cameraPos += moveTo;
+        }
+
+        private void TrySetParam(EffectParameter parameter, Vector4 value)
+        {
+            try
+            {
+                parameter.SetValue(value);
+            }catch(Exception ex)
+            {
+
+            }
         }
 
         public override void OnUnload()

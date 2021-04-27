@@ -36,7 +36,7 @@ namespace MonoKanEngine.src
         {
             IsMouseVisible = false;
             GraphicsDeviceManager = new GraphicsDeviceManager(this);
-            GraphicsDeviceManager.PreferredBackBufferHeight = 780;
+            GraphicsDeviceManager.PreferredBackBufferHeight = 760;
             GraphicsDeviceManager.PreferredBackBufferWidth = 1080;
             
             //GraphicsDeviceManager.ToggleFullScreen();

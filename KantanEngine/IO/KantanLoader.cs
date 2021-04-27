@@ -20,7 +20,7 @@ namespace KantanEngine.IO
 
         #region Fields
 
-        private readonly Dictionary<FileType, string> _loadQueue = new Dictionary<FileType, string>();
+        private readonly List<Tuple<FileType, string>> _loadQueue = new List<Tuple<FileType, string>>();
         private readonly Dictionary<string, byte[]> _bufferedRessources = new Dictionary<string, byte[]>();
 
         #endregion
@@ -45,13 +45,13 @@ namespace KantanEngine.IO
 
         public KantanLoader AddFileToQueue(string path)
         {
-            _loadQueue.Add(FileType.NormalFile, path);
+            _loadQueue.Add(new Tuple<FileType, string>(FileType.NormalFile, path));
             return this;
         }
 
         public KantanLoader AddPackageToQueue(string path)
         {
-            _loadQueue.Add(FileType.KCPPackage, path);
+            _loadQueue.Add(new Tuple<FileType, string>(FileType.KCPPackage, path));
             return this;
         }
 
@@ -59,18 +59,18 @@ namespace KantanEngine.IO
         {
             foreach (var item in _loadQueue)
             {
-                if (!File.Exists(item.Value)) continue;
+                if (!File.Exists(item.Item2)) continue;
 
                 try
                 {
-                    Log.Default.Write($"Loading '{item.Value}'");
-                    switch (item.Key)
+                    Log.Default.Write($"Loading '{item.Item2}'");
+                    switch (item.Item1)
                     {
                         case FileType.KCPPackage:
-                            await LoadPackageAsync(item.Value);
+                            await LoadPackageAsync(item.Item2);
                             break;
                         case FileType.NormalFile:
-                            await LoadFileAsync(item.Value);
+                            await LoadFileAsync(item.Item2);
                             break;
                         default:
                             break;
@@ -78,8 +78,8 @@ namespace KantanEngine.IO
                 }
                 catch (Exception ex)
                 {
-                    var type = Enum.GetName(typeof(FileType), item.Key);
-                    Log.Default.Write($"Couldn't load '{item.Value}' ({type}) ex: {ex.Message}");
+                    var type = Enum.GetName(typeof(FileType), item.Item1);
+                    Log.Default.Write($"Couldn't load '{item.Item2}' ({type}) ex: {ex.Message}");
                 }
 
             }

@@ -168,11 +168,14 @@
     </None>
     <None Include="app.config" />
     <None Include="app.manifest" />
-    <None Include="Ressources\Map.fbx" />
-    <None Include="packages.config" />
-    <None Include="Packages\test.kco">
+    <None Include="Packages\map.kco">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Packages\shader.kco">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Ressources\Map.fbx" />
+    <None Include="packages.config" />
     <Content Include="Ressources\Shaders\test.fx" />
   </ItemGroup>
   <ItemGroup>

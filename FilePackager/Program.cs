@@ -17,7 +17,13 @@ namespace FilePackager
             new Packager()
                 //.AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\windows\")
                 .AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\bin\DesktopGL\")
-                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\test.kco");
+                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\shader.kco");
+
+            /*new Packager()
+                .AddFolder(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Ressources\Map\")
+                .Create(@"C:\Users\Benny\source\repos\BloodKnightParty\BloodKnightParty\Packages\map.kco");
+            */
+
             Console.WriteLine("Done!");
             Console.ReadLine();
         }
