@@ -45,7 +45,7 @@ namespace BloodKnightParty.src.Core
         {
             Context.RunService<GraphicsDeviceManager>(gdm =>
             {
-                gdm.GraphicsDevice.Clear(Color.Black);
+                gdm.GraphicsDevice.Clear(Color.LightBlue);
 
                 _cameraRot.Y = (float) Math.Min(Math.Max(_cameraRot.Y, _maxLookDown), _maxLookUp);
 
@@ -128,16 +128,17 @@ namespace BloodKnightParty.src.Core
             _model = loader.Load<Model>("Map");
 
             var gdm = Context.GetService<GraphicsDeviceManager>();
-            //gdm.GraphicsDevice.Viewport = new Viewport(0, 0, 1080, 780);
+            gdm.GraphicsDevice.Viewport = new Viewport(0, 0, 800, 600);
+            gdm.ApplyChanges();
             var viewPort = gdm.GraphicsDevice.Viewport;
             _middleOfScreen = new Vector2(viewPort.Width / 2, viewPort.Height / 2);
 
             var ditherTex = loader.Load<Texture2D>("Shaders/BayerDither8x8");
             _effect = loader.Load<Effect>("Shaders/test");
             _effect.Parameters["DitherPattern"].SetValue(ditherTex);
-            _effect.Parameters["DitherPatternSize"].SetValue(new Vector4(64));
+            _effect.Parameters["DitherPatternSize"].SetValue(new Vector4(8));
             _effect.Parameters["ScreenParams"].SetValue(new Vector4(viewPort.Width, viewPort.Height, 1.0f + 1.0f/ viewPort.Width, 1.0f + 1.0f/ viewPort.Height));
-            _effect.Parameters["ProjectionParams"].SetValue(new Vector4(1, 0.1f, 10000, 1/ 100000));
+            _effect.Parameters["ProjectionParams"].SetValue(new Vector4(1, 0.1f, 100000, 1/ 100000));
 
             foreach (var model in _model.Meshes)
             {

@@ -8,7 +8,8 @@ float4 ScreenParams;
 sampler2D DitherPattern;
 float4 DitherPatternSize;
 
-#define Black float4(0,0,0,1.0)
+#define Empty float4(0,0,0,0.0)
+#define Black float4(0,0,0,1)
 #define White float4(1.0,1.0,1.0,1.0)
 #define zNear ProjectionParams.y
 #define zFar ProjectionParams.z
@@ -56,32 +57,17 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR
     float depth = LinearizeDepth(input.DepthInfo.z / input.DepthInfo.w) / zFar;
     float depthColor = 1.0 - (depth / 1.0);
     
-    
-    
-    float2 screenPos = input.ScreenPos.xy / input.ScreenPos.w;// / 2.0 + 0.5;
-    float2 res = ScreenParams.xy / DitherPatternSize.xy;
-    float2 pos = (screenPos.xy * ScreenParams.xy) / res.xy;
+    float2 screenPos = input.ScreenPos.xy / input.ScreenPos.w;
+    float2 pos = (screenPos.xy * ScreenParams.xy * DitherPatternSize.xy) / trunc((ScreenParams.xy / DitherPatternSize.xy));
     pos = pos - trunc(pos);
-    //pos.y /= ScreenParams.x / ScreenParams.y;
+    pos.y /= ScreenParams.x / ScreenParams.y;
     
     float ditherValue = tex2D(DitherPattern, pos).r;
-    
     float ditherColor = step(ditherValue, depthColor);
     
-    /*
-    float2 screenPos = input.ScreenPos.xy / input.ScreenPos.w;
-    screenPos.xy = floor(screenPos.xy * ScreenParams.xy);
-    screenPos.xy = floor(screenPos.xy * 0.1) * 0.5;
-    float2 ditherCord = ((screenPos.xy / DitherPatternSize.xy) / screenPos.xy);
-    float4 ditherValue = tex2D(DitherPattern, ditherCord);
-    */    
-
-    //float ditherColor = step(ditherValue, depthColor) * depthColor;
-    
-    //return ditherValue;
-    return float4(ditherColor, ditherColor, ditherColor, 1.0);
-    //return lerp(Black, White, ditherColor);
-    //return float4(1.0, 1.0, 1.0, 1.0);
+    //return float4(ditherValue, ditherValue, ditherValue, 1.0);
+    clip(depthColor - ditherValue);
+    return lerp(Empty, Black, ditherColor);
 }
 
 technique Ambient
